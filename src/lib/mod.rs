@@ -146,9 +146,6 @@ fn tachyon(lua: &Lua) -> Result<Table> {
     exports.set(
         "new",
         lua.create_function(|lua, (items, opts): (Vec<String>, Option<Table>)| {
-            lua.globals()
-                .get::<mlua::Function>("print")?
-                .call::<()>("Called the `new` function in tachyon!")?;
             let opts = opts;
             let match_paths = match &opts {
                 Some(t) => t.get::<bool>("match_paths").unwrap_or(true),
