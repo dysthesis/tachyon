@@ -25,4 +25,12 @@ in
       pname = "tachyon";
       doCheck = false;
       CARGO_PROFILE = "release";
+      installPhase =
+        # sh
+        ''
+          runHook preInstall
+          mkdir -p $out/lua
+          cp target/release/libtachyon.so $out/lua/tachyon.so
+          runHook postInstall
+        '';
     })
