@@ -15,7 +15,7 @@ proptest-derive = "0.7.0"
 [lib]
 name = "tachyon"
 path = "src/lib/mod.rs"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [profile.release]
 strip = true

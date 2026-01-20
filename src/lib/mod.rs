@@ -160,5 +160,44 @@ fn tachyon(lua: &Lua) -> Result<Table> {
         })?,
     )?;
 
+    exports.set(
+        "match",
+        lua.create_function(
+            |lua,
+             (stritems, inds, query, _opts): (Table, Table, Table, Option<Table>)|
+             -> Result<Table> {
+                // Reconstruct the prompt from MiniPick-style query table.
+                let mut needle = String::new();
+                for part in query.sequence_values::<mlua::String>() {
+                    let part = part?;
+                    needle.push_str(&part.to_str()?);
+                }
+
+                let out = lua.create_table()?;
+                let mut out_i: i64 = 1;
+
+                // If query is empty, return `inds` unchanged.
+                if needle.is_empty() {
+                    for idx in inds.sequence_values::<i64>() {
+                        out.set(out_i, idx?)?;
+                        out_i += 1;
+                    }
+                    return Ok(out);
+                }
+
+                // Filter by substring containment.
+                for idx in inds.sequence_values::<i64>() {
+                    let idx = idx?;
+                    let hay: mlua::String = stritems.get(idx)?;
+                    if hay.to_str()?.contains(&needle) {
+                        out.set(out_i, idx)?;
+                        out_i += 1;
+                    }
+                }
+
+                Ok(out)
+            },
+        )?,
+    )?;
     Ok(exports)
 }
